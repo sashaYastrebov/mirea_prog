@@ -1,36 +1,46 @@
-using HorizonSideRobots
-include("functions.jl")
-
-r = Robot("untitled11.sit", animate = true)
-
-function counting_partitions_in_row!(robot, side)
-    state = 0
-    num_partitions = 0
-    while try_move!(robot, side)
-        if state == 0 && isborder(robot, Nord)
-            state = 1
-        elseif  state == 1 && !isborder(robot, Nord)
-            num_partitions += 1
-            state = 0
-        end
-    end
-    return num_partitions
-end
-
-function number_of_partitions!(robot)
-    path = move_to_angle!(robot, (Sud, West))
-    num_partitions = 0
-    side = Ost
-    while !isborder(robot, Nord)
-        num_partitions += counting_partitions_in_row!(robot, side)
-        side = inverse(side)
+function move_two_sides(robot, x, y):nothing
+    while y < 0
         move!(robot, Nord)
+        y += 1
     end
-    num_partitions += counting_partitions_in_row!(robot, side)    
-    along!(robot, Sud)
-    along!(robot, West)
-    move_to_back!(robot, path)
-    return num_partitions
+    while x > 0
+        move!(robot, West)
+        x -= 1
+    end
 end
-
-print(number_of_partitions!(r))
+ 
+function result(robot):nothing
+    x = 0
+    y = 0
+    while !isborder(robot, West)
+        move!(robot, West)
+        x -= 1
+    end
+    while !isborder(robot, Nord)
+        move!(robot, Nord)
+        y += 1
+    end
+    cnt = 0
+    dir = Ost
+    while (!isborder(robot, Ost) || !isborder(robot, Sud))
+        flag = false
+        while !isborder(robot, dir)
+            move!(robot, dir)
+            if dir == Ost x += 1
+            else x -= 1 end
+            if isborder(robot, Sud) flag = true
+            else 
+                if flag cnt += 1 end 
+                flag = false 
+            end
+        end
+        if !isborder(robot, Sud)
+            move!(robot, Sud)
+            y -= 1
+        end
+        if dir == Ost dir = West
+        else dir = Ost end
+    end
+    print(cnt)
+    move_two_sides(robot, x, y)
+end
