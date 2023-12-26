@@ -1,25 +1,25 @@
-include("robot.jl")
-include("functions.jl")
-
-function mark_star!(robot)
-    putmarker!(robot)
-    for side in ((Nord, West), (Nord, Ost), (Sud, West), (Sud, Ost))
-        f(robot, side)
+function dmove!(r, side1, side2)
+    move!(r, side1)
+    move!(r, side2)
+end 
+function diagonalalongandback!(r, Side1, Side2, Side3, Side4)
+    while !isborder(r, Side1) && !isborder(r, Side2)
+        dmove!(r, Side1, Side2)
+        putmarker!(r)
+    end
+    while ismarker(r) == 1
+        dmove!(r, Side3, Side4)
     end
 end
-
-
-function f(robot, side::NTuple{2, HorizonSide})
-    num_steps = 0
-    while !isborder(robot, side)
-        move!(robot, side)
-        putmarker!(robot)
-        num_steps += 1
-    end
-    side = inverse(side)
-    for s in side
-        along!(robot, s, num_steps)
-    end
+ 
+function task4!(r)
+	Side1 = Nord
+	Side2 = Ost
+	Side3 = Sud 
+	Side4 = West
+    diagonalalongandback!(r, Side1, Side2, Side3, Side4)
+    diagonalalongandback!(r, Side2, Side3, Side4, Side1)
+    diagonalalongandback!(r, Side3, Side4, Side1, Side2)
+    diagonalalongandback!(r, Side4, Side1, Side2, Side3)
+    putmarker!(r)   
 end
-
-mark_star!(r)
